@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libras</title>
+
+
+    <meta name='author' content='Sajith Amma' /> 
+    <script src='https://code.jquery.com/jquery-3.7.1.js'> </script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/recorderjs/0.1.0/recorder.min.js'> </script>
+   
+    <style>
+        li {display:inline; margin-right:10px;}
+    </style> 
+</head>
+<body>
+    <script>
+const getHours = () => {
+
+  const clock = document.getElementsByClassName('clock')[0]
+  const date = new Date()
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const seconds = date.getSeconds()
+  const limite = document.getElementById('range')
+  
+  const hour = hours < 10 ? `0${hours}` : hours
+  const minute = minutes < 10 ? `0${minutes}` : minutes
+  const second = seconds < 10 ? `0${seconds}` : seconds
+  clock.innerHTML = `${hour}:${minute}:${second}`
+  limite.innerHTML=`<input type='range' min=${second} max=${hours} >`
+
+ const dias=['Segunda','Terça','Quarta','Quinta','Sexta','Sábados']
+ const meses=['Janeiro','Fevereiro','Marços','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+
+
+  const myHeading = document.querySelector("h1");
+  const dia=dias[date.getDay()-1]
+myHeading.textContent = `Dia ${dia} do mês de ${meses[date.getMonth()]} do ano de ${date.getFullYear()}. `;
+
+
+}
+
+setInterval(() => {
+  
+  getHours()
+}, 1000)
+
+
+
+    </script>
+<h1></h1>
+<div class="container">
+  <div class="clock"></div>
+
+<div id="range"></div>
+  
+</div>
+<label for="week">Escolha a semana:</label>
+
+<input type="week" name="week" id="camp-week" min="2024-W18" max="2024-W26" required />
+
+
+        <div vw class="enabled">
+          <div vw-access-button class="active"></div>
+          <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+          </div>
+        </div>
+        <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+        <script>
+          new window.VLibras.Widget('https://vlibras.gov.br/app');
+        </script>
+     
+      
+     <label for="">Digite seu texto</label><textarea>
+
+
+     </textarea>
+      
