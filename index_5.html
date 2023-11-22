@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to right, #6495ED, #FFA07A);
+            color: #333;
+        }
+
+        #title {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        #gift-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        #gift-box {
+            width: 150px;
+            height: 150px;
+            background-image: url('gift_box.png'); /* Substitua pelo caminho real para sua imagem de caixa de presente */
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+        }
+
+        #shelf-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            margin-top: 20px;
+        }
+
+        .present {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 180px;
+            height: 180px;
+            background-color: #ffcc00;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            position: relative;
+            margin: 0 10px;
+        }
+
+        .present img {
+            width: 120px; /* Ajuste o tamanho conforme necessário */
+            height: 120px; /* Ajuste o tamanho conforme necessário */
+            margin-bottom: 10px;
+        }
+
+        .present:hover {
+            transform: scale(1.1);
+        }
+
+        .highlighted {
+            border: 3px solid #ff0000;
+            transform: scale(1.1);
+        }
+
+        .floating-discount {
+            position: absolute;
+            background-color: #ffcc00;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 20px;
+            color: #fff;
+            display: none;
+            animation: float 2s infinite alternate;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(20px);
+            }
+        }
+
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #congratulations {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            display: none;
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        #you-chose-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #discount {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        #redirect-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff0000;
+            display: none;
+        }
+
+        #countdown {
+            text-align: center;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .highlight {
+            color: #ff0000;
+        }
+
+        .gift-fall {
+            position: absolute;
+            animation: fall 5s linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+    </style>
+    <title>Sorteio de Desconto</title>
+</head>
+<body>
+
+<div id="title">Você pode ganhar de 10% até 50% no seu curso!</div>
+
+<div id="gift-container" onclick="startGiftAnimation()">
+    <div id="gift-box">Clique para começar!</div>
+</div>
+
+<div id="shelf-container">
+    <div class="row">
+        <div class="present" onclick="startAnimation('50%', '🎉', this)">
+            <img class="gift" src="before_click.png" alt="Before Click">
+            Presente 1
+        </div>
+        <div class="present" onclick="startAnimation('50%', '🎈', this)">
+            <img class="gift" src="before_click.png" alt="Before Click">
+            Presente 2
+        </div>
+        <div class="present" onclick="startAnimation('50%', '🎊', this)">
+            <img class="gift" src="before_click.png" alt="Before Click">
+            Presente 3
+        </div>
+        
+    </div>
+    <div class="row">
+        <!-- Adicione mais presentes aqui -->
+        <div class="present" onclick="startAnimation('50%', '🎁', this)">
+            <img class="gift" src="before_click.png" alt="Before Click">
+            Presente 4
+        </div>
+        <div class="present" onclick="startAnimation('50%', '🎉', this)">
+            <img class="gift" src="before_click.png" alt="Before Click">
+            Presente 5
+        </div>
+        <div class="present" onclick="startAnimation('50%', '🎈', this)">
+            <img class="gift" src="before_click.png" alt="Before Click">
+            Presente 6
+        </div>
+        
+    </div>
+    <!-- Adicione mais linhas com presentes aqui -->
+</div>
+
+<div id="congratulations" class="title highlight">Parabéns! Você ganhou 50% de desconto no seu curso preferido!</div>
+
+<div id="you-chose-message" class="title"></div>
+
+<div id="discount" class="title"></div>
+
+<div id="redirect-message" class="highlight title">Você será direcionado para o WhatsApp para falar com um representante da faculdade.</div>
+
+<div id="countdown" class="title"></div>
+
+<script>
+    const congratulationsElement = document.getElementById('congratulations');
+    const discountElement = document.getElementById('discount');
+    const giftContainer = document.getElementById('gift-container');
+    const youChoseMessage = document.getElementById('you-chose-message');
+    const redirectMessage = document.getElementById('redirect-message');
+    const countdownElement = document.getElementById('countdown');
+    let hasClicked = false;
+
+    // Adiciona presentes caindo ao carregar a página
+    window.onload = function () {
+        for (let i = 0; i < 10; i++) {
+            createGift(Math.random() * window.innerWidth);
+        }
+    };
+
+    function startGiftAnimation() {
+        if (!hasClicked) {
+            hasClicked = true;
+
+            const giftBox = document.getElementById('gift-box');
+            giftBox.style.display = 'none';
+
+            const intervalId = setInterval(() => {
+                const randomX = Math.random() * (window.innerWidth - 150);
+                createGift(randomX);
+            }, 500);
+
+            setTimeout(() => {
+                clearInterval(intervalId);
+                congratulationsElement.style.display = 'block';
+                discountElement.innerText = 'Desconto: 50%';
+                redirectMessage.style.display = 'block';
+
+                let countdown = 15;
+                const countdownInterval = setInterval(() => {
+                    countdownElement.innerText = `Você será redirecionado em ${countdown} segundos.`;
+                    countdown--;
+
+                    if (countdown < 0) {
+                        clearInterval(countdownInterval);
+                        redirectToWhatsApp();
+                    }
+                }, 1000);
+            }, 6000);
+        }
+    }
+
+    function startAnimation(desconto, icon, clickedElement) {
+        if (hasClicked) {
+            return;
+        }
+
+        hasClicked = true;
+
+        const floatingDiscount = document.createElement('div');
+        floatingDiscount.className = 'floating-discount';
+        floatingDiscount.innerText = `Desconto: ${desconto}`;
+        clickedElement.appendChild(floatingDiscount);
+
+        setTimeout(() => {
+            floatingDiscount.style.display = 'block';
+            clickedElement.classList.remove('highlighted');
+        }, 2000);
+
+        const updateFloatingDiscountPosition = () => {
+            const randomX = Math.random() * (window.innerWidth - floatingDiscount.clientWidth);
+            const randomY = Math.random() * (window.innerHeight - floatingDiscount.clientHeight);
+            floatingDiscount.style.left = `${randomX}px`;
+            floatingDiscount.style.top = `${randomY}px`;
+        };
+
+        const intervalId = setInterval(updateFloatingDiscountPosition, 1000);
+
+        for (let i = 0; i < 10; i++) {
+            const randomX = Math.random() * (window.innerWidth - 50);
+            createGift(randomX);
+        }
+
+        setTimeout(() => {
+            clickedElement.removeChild(floatingDiscount);
+            clearInterval(intervalId);
+
+            youChoseMessage.innerText = 'Você escolheu seu presente! Agora aguarde...';
+            youChoseMessage.classList.add('highlight');
+
+            congratulationsElement.style.display = 'block';
+
+            discountElement.innerText = `Desconto: ${desconto}`;
+        }, 4000);
+
+        clickedElement.classList.add('highlighted');
+    }
+
+    function redirectToWhatsApp() {
+        const whatsappNumber = '5588988848251';
+        const message = encodeURIComponent('Olá! Ganhei um desconto no sorteio. Como posso usá-lo?');
+        const whatsappURL = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${message}`;
+
+        window.location.href = whatsappURL;
+    }
+
+    function createGift(x) {
+        const giftElement = document.createElement('div');
+        giftElement.className = 'gift-fall';
+        giftElement.style.left = `${x}px`;
+
+        const imgElement = document.createElement('img');
+        imgElement.src = 'after_click.png'; // Substitua pelo caminho real da imagem após clicar
+        imgElement.alt = 'After Click';
+        imgElement.style.width = '80px'; // Ajuste o tamanho conforme necessário
+        imgElement.style.height = '80px'; // Ajuste o tamanho conforme necessário
+
+        giftElement.appendChild(imgElement);
+        document.body.appendChild(giftElement);
+
+        setTimeout(() => {
+            document.body.removeChild(giftElement);
+        }, 5000);
+    }
+</script>
+
+</body>
+</html>
