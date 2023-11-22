@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to right, #6495ED, #FFA07A);
+            animation: gradientMove 20s linear infinite, scaleBackground 30s infinite alternate;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 100% 50%;
+            }
+        }
+
+        @keyframes scaleBackground {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.02);
+            }
+        }
+
+        #gift-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .gift {
+            width: 100px;
+            height: 100px;
+            background-color: #ffcc00;
+            border-radius: 10px;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            opacity: 0;
+            animation: move 5s linear infinite, fadeIn 1s forwards;
+        }
+
+        @keyframes move {
+            0% {
+                transform: translate(0, -100%);
+            }
+            100% {
+                transform: translate(0, 100%);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        #shelf {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            margin-top: 20px;
+        }
+
+        .present {
+            width: 150px;
+            height: 150px;
+            background-color: #ffcc00;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            margin: 0 10px;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        .present:hover {
+            transform: scale(1.1);
+            background-color: #ffd700;
+        }
+
+        .present:hover::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            border: 2px solid #ff0000;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.9);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.9);
+                opacity: 0.7;
+            }
+        }
+
+        .highlighted {
+            border: 3px solid #ff0000;
+            transform: scale(1.1);
+        }
+
+        .floating-discount {
+            position: absolute;
+            background-color: #ffcc00;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 20px;
+            display: none;
+            animation: float 2s infinite alternate;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(20px);
+            }
+        }
+
+        #congratulations,
+        #title,
+        #discount,
+        #choose-present,
+        #congratulations-message,
+        #you-chose-message,
+        #redirect-message,
+        #countdown {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #333;
+            font-weight: bold;
+            opacity: 0;
+            animation: fade-in 1s forwards;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        #title {
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            font-size: 30px;
+        }
+
+        .highlight {
+            color: #ff0000;
+        }
+    </style>
+    <title>Sorteio de Desconto</title>
+</head>
+<body>
+
+<div id="title">Sorteio de Desconto</div>
+
+<div id="choose-present" class="highlight">Escolha o seu presente e ganhe um desconto de 10% à 50%:</div>
+
+<div id="congratulations" class="highlight"></div>
+
+<div id="you-chose-message"></div>
+
+<div id="congratulations-message"></div>
+
+<div id="discount"></div>
+
+<div id="gift-container"></div>
+
+<div id="shelf">
+    <div class="present" onclick="startAnimation('50%', '🎁', this)">🎁</div>
+    <div class="present" onclick="startAnimation('50%', '🎉', this)">🎉</div>
+    <div class="present" onclick="startAnimation('50%', '🎈', this)">🎈</div>
+    <div class="present" onclick="startAnimation('50%', '🎊', this)">🎊</div>
+    <div class="present" onclick="startAnimation('50%', '🎂', this)">🎂</div>
+</div>
+
+<div id="redirect-message">Você será direcionado para o WhatsApp para falar com um representante da faculdade.</div>
+
+<div id="countdown"></div>
+
+<script>
+    const congratulationsElement = document.getElementById('congratulations');
+    const discountElement = document.getElementById('discount');
+    const giftContainer = document.getElementById('gift-container');
+    const congratulationsMessage = document.getElementById('congratulations-message');
+    const youChoseMessage = document.getElementById('you-chose-message');
+    const redirectMessage = document.getElementById('redirect-message');
+    const countdownElement = document.getElementById('countdown');
+    let hasClicked = false;
+
+    function startAnimation(desconto, icon, clickedElement) {
+        if (hasClicked) {
+            return;
+        }
+
+        hasClicked = true;
+
+        const floatingDiscount = document.createElement('div');
+        floatingDiscount.className = 'floating-discount';
+        floatingDiscount.innerText = `Desconto: ${desconto}`;
+        clickedElement.appendChild(floatingDiscount);
+
+        setTimeout(() => {
+            floatingDiscount.style.display = 'block';
+            clickedElement.classList.remove('highlighted');
+        }, 2000);
+
+        const updateFloatingDiscountPosition = () => {
+            const randomX = Math.random() * (window.innerWidth - floatingDiscount.clientWidth);
+            const randomY = Math.random() * (window.innerHeight - floatingDiscount.clientHeight);
+            floatingDiscount.style.left = `${randomX}px`;
+            floatingDiscount.style.top = `${randomY}px`;
+        };
+
+        const intervalId = setInterval(updateFloatingDiscountPosition, 1000);
+
+        for (let i = 0; i < 10; i++) {
+            const giftElement = document.createElement('div');
+            giftElement.className = 'gift';
+            giftElement.innerText = `🎓 ${icon} ${desconto}`;
+            giftElement.style.left = `${Math.random() * window.innerWidth}px`;
+            giftElement.style.top = `${Math.random() * window.innerHeight}px`;
+            giftElement.style.opacity = '0';
+            giftContainer.appendChild(giftElement);
+
+            setTimeout(() => {
+                giftElement.style.opacity = '1';
+            }, 100 * i);
+
+            setTimeout(() => {
+                giftContainer.removeChild(giftElement);
+            }, 4000);
+        }
+
+        setTimeout(() => {
+            clickedElement.removeChild(floatingDiscount);
+            clearInterval(intervalId);
+
+            youChoseMessage.innerText = 'Você escolheu seu presente!';
+            youChoseMessage.classList.add('highlight');
+
+            congratulationsElement.innerText = 'Parabéns! Você ganhou o desconto no seu curso preferido!';
+            congratulationsElement.classList.add('highlight');
+
+            discountElement.innerText = `Desconto: ${desconto}`;
+
+            congratulationsMessage.innerText = `Você escolheu o presente ${icon} com ${desconto} de desconto.`;
+            congratulationsMessage.classList.add('highlight');
+
+            redirectMessage.style.display = 'block';
+
+            let countdown = 15;
+            const countdownInterval = setInterval(() => {
+                countdownElement.innerText = `Você será redirecionado em ${countdown} segundos.`;
+                countdown--;
+
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    redirectToWhatsApp();
+                }
+            }, 1000);
+
+        }, 4000);
+
+        clickedElement.classList.add('highlighted');
+    }
+
+    function redirectToWhatsApp() {
+        const whatsappNumber = '5588988848251';
+        const message = encodeURIComponent('Olá! Ganhei um desconto no sorteio. Como posso usá-lo?');
+        const whatsappURL = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${message}`;
+
+        window.location.href = whatsappURL;
+    }
+</script>
+
+</body>
+</html>
