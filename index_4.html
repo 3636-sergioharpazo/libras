@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(to right, #6495ED, #FFA07A);
+            color: #333;
+        }
+
+        #title {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: #fff;
+            font-size: 30px;
+            margin-bottom: 20px;
+        }
+
+        #gift-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .gift {
+            width: 100px;
+            height: 100px;
+            background-color: #ffcc00;
+            border-radius: 10px;
+            position: absolute;
+            animation: fall 5s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-200px);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        #shelf-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+            margin-top: 20px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .present {
+            width: 150px;
+            height: 150px;
+            background-color: #ffcc00;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            position: relative;
+            margin: 0 10px;
+        }
+
+        .present:hover {
+            transform: scale(1.1);
+        }
+
+        .highlighted {
+            border: 3px solid #ff0000;
+            transform: scale(1.1);
+        }
+
+        .floating-discount {
+            position: absolute;
+            background-color: #ffcc00;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 20px;
+            display: none;
+            animation: float 2s infinite alternate;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(-20px);
+            }
+            100% {
+                transform: translateY(20px);
+            }
+        }
+
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #congratulations {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            display: none;
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        #you-chose-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #congratulations-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        #discount {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        #redirect-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff0000;
+        }
+
+        #countdown {
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .highlight {
+            color: #ff0000;
+        }
+    </style>
+    <title>Sorteio de Desconto</title>
+</head>
+<body>
+
+<div id="title">Sorteio de Desconto</div>
+
+<div id="gift-container"></div>
+
+<div id="choose-present" class="title highlight">Escolha o seu presente e ganhe um desconto de 10% à 50%:</div>
+
+<div id="shelf-container">
+    <div class="row">
+        <div class="present" onclick="startAnimation('50%', '🎉', this)">🎉 Presente 1</div>
+        <div class="present" onclick="startAnimation('50%', '🎈', this)">🎈 Presente 2</div>
+        <div class="present" onclick="startAnimation('50%', '🎊', this)">🎊 Presente 3</div>
+        <div class="present" onclick="startAnimation('50%', '🎂', this)">🎂 Presente 4</div>
+    </div>
+    <div class="row">
+        <div class="present" onclick="startAnimation('50%', '🎁', this)">🎁 Presente 5</div>
+        <div class="present" onclick="startAnimation('50%', '🎉', this)">🎉 Presente 6</div>
+        <div class="present" onclick="startAnimation('50%', '🎈', this)">🎈 Presente 7</div>
+        <div class="present" onclick="startAnimation('50%', '🎊', this)">🎊 Presente 8</div>
+    </div>
+    <!-- Add more rows with presents here -->
+</div>
+
+<div id="congratulations" class="title highlight">Parabéns! Você ganhou o desconto no seu curso preferido!</div>
+
+<div id="you-chose-message"></div>
+
+<div id="congratulations-message"></div>
+
+<div id="discount"></div>
+<div id="countdown"></div>
+<div id="redirect-message" class="highlight">Você será direcionado para o WhatsApp para falar com um representante da faculdade.</div>
+
+
+
+<script>
+    const congratulationsElement = document.getElementById('congratulations');
+    const discountElement = document.getElementById('discount');
+    const giftContainer = document.getElementById('gift-container');
+    const congratulationsMessage = document.getElementById('congratulations-message');
+    const youChoseMessage = document.getElementById('you-chose-message');
+    const redirectMessage = document.getElementById('redirect-message');
+    const countdownElement = document.getElementById('countdown');
+    let hasClicked = false;
+
+    function startAnimation(desconto, icon, clickedElement) {
+        if (hasClicked) {
+            return;
+        }
+
+        hasClicked = true;
+
+        const floatingDiscount = document.createElement('div');
+        floatingDiscount.className = 'floating-discount';
+        floatingDiscount.innerText = `Desconto: ${desconto}`;
+        clickedElement.appendChild(floatingDiscount);
+
+        setTimeout(() => {
+            floatingDiscount.style.display = 'block';
+            clickedElement.classList.remove('highlighted');
+        }, 2000);
+
+        const updateFloatingDiscountPosition = () => {
+            const randomX = Math.random() * (window.innerWidth - floatingDiscount.clientWidth);
+            const randomY = Math.random() * (window.innerHeight - floatingDiscount.clientHeight);
+            floatingDiscount.style.left = `${randomX}px`;
+            floatingDiscount.style.top = `${randomY}px`;
+        };
+
+        const intervalId = setInterval(updateFloatingDiscountPosition, 1000);
+
+        for (let i = 0; i < 10; i++) {
+            const giftElement = document.createElement('div');
+            giftElement.className = 'gift';
+            giftElement.innerText = `🎓 ${icon} ${desconto}`;
+            giftElement.style.left = `${Math.random() * window.innerWidth}px`;
+            giftElement.style.top = `${Math.random() * window.innerHeight}px`;
+            giftContainer.appendChild(giftElement);
+
+            setTimeout(() => {
+                giftContainer.removeChild(giftElement);
+            }, 4000);
+        }
+
+        setTimeout(() => {
+            clickedElement.removeChild(floatingDiscount);
+            clearInterval(intervalId);
+
+            youChoseMessage.innerText = 'Você escolheu seu presente!';
+            youChoseMessage.classList.add('highlight');
+
+            congratulationsElement.style.display = 'block';
+
+            discountElement.innerText = `Desconto: ${desconto}`;
+
+            congratulationsMessage.innerText = `Você escolheu o presente ${icon} com ${desconto} de desconto.`;
+            congratulationsMessage.classList.add('highlight');
+
+            redirectMessage.style.display = 'block';
+
+            let countdown = 15;
+            const countdownInterval = setInterval(() => {
+                countdownElement.innerText = `Você será redirecionado em ${countdown} segundos.`;
+                countdown--;
+
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    redirectToWhatsApp();
+                }
+            }, 1000);
+
+        }, 4000);
+
+        clickedElement.classList.add('highlighted');
+    }
+
+    function redirectToWhatsApp() {
+        const whatsappNumber = '5588988848251';
+        const message = encodeURIComponent('Olá! Ganhei um desconto no sorteio. Como posso usá-lo?');
+        const whatsappURL = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${message}`;
+
+        window.location.href = whatsappURL;
+    }
+</script>
+
+</body>
+</html>
